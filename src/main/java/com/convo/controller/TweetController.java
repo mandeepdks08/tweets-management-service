@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.convo.datamodel.Tweet;
 import com.convo.datamodel.User;
 import com.convo.kafka.TweetsProducer;
+import com.convo.restmodel.TweetEditRequest;
 import com.convo.restmodel.TweetSaveRequest;
 import com.convo.util.GsonUtils;
 import com.convo.util.SystemContextHolder;
@@ -33,4 +34,14 @@ public class TweetController {
 				.createdOn(LocalDateTime.now()).processedOn(LocalDateTime.now()).build();
 		tweetsProducer.sendTweet(tweet);
 	}
+
+	@RequestMapping(value = "/edit", method = RequestMethod.PATCH)
+	protected void editTweet(@RequestBody TweetEditRequest tweetEditRequest) {
+		log.info("Tweet edit request {}", GsonUtils.getGson().toJson(tweetEditRequest));
+		User loggedInUser = SystemContextHolder.getLoggedInUser();
+		Tweet tweet = Tweet.builder().id(tweetEditRequest.getTweetId()).tweet(tweetEditRequest.getTweet())
+				.userId(loggedInUser.getUserId()).build();
+		tweetsProducer.sendTweet(tweet);
+	}
+
 }
