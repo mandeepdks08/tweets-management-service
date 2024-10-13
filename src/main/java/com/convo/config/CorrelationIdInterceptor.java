@@ -8,16 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import com.convo.util.AppConstants;
 import com.convo.util.SnowflakeIdGenerator;
 
 @Component
 public class CorrelationIdInterceptor implements HandlerInterceptor {
-
-	private static final String PARENT_CORRELATION_ID_HEADER = "X-Parent-Correlation-ID";
-	private static final String CHILD_CORRELATION_ID_HEADER = "X-Child-Correlation-ID";
-
-	private static final String MDC_PARENT_CORRELATION_ID_KEY = "parentCorrelationId";
-	private static final String MDC_CHILD_CORRELATION_ID_KEY = "childCorrelationId";
 
 	@Autowired
 	private SnowflakeIdGenerator snowflakeIdGenerator;
@@ -25,18 +20,18 @@ public class CorrelationIdInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-		String parentCorrelationId = request.getHeader(PARENT_CORRELATION_ID_HEADER);
+		String parentCorrelationId = request.getHeader(AppConstants.PARENT_CORRELATION_ID_HEADER.getValue());
 		if (parentCorrelationId == null) {
 			parentCorrelationId = String.valueOf(snowflakeIdGenerator.nextId());
 		}
 
 		String childCorrelationId = String.valueOf(snowflakeIdGenerator.nextId());
 
-		response.addHeader(PARENT_CORRELATION_ID_HEADER, parentCorrelationId);
-		response.addHeader(CHILD_CORRELATION_ID_HEADER, childCorrelationId);
+		response.addHeader(AppConstants.PARENT_CORRELATION_ID_HEADER.getValue(), parentCorrelationId);
+		response.addHeader(AppConstants.CHILD_CORRELATION_ID_HEADER.getValue(), childCorrelationId);
 
-		MDC.put(MDC_PARENT_CORRELATION_ID_KEY, parentCorrelationId);
-		MDC.put(MDC_CHILD_CORRELATION_ID_KEY, childCorrelationId);
+		MDC.put(AppConstants.MDC_PARENT_CORRELATION_ID_KEY.getValue(), parentCorrelationId);
+		MDC.put(AppConstants.MDC_CHILD_CORRELATION_ID_KEY.getValue(), childCorrelationId);
 
 		return true;
 	}
@@ -44,8 +39,8 @@ public class CorrelationIdInterceptor implements HandlerInterceptor {
 	@Override
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
-		MDC.remove(MDC_PARENT_CORRELATION_ID_KEY);
-		MDC.remove(MDC_CHILD_CORRELATION_ID_KEY);
+		MDC.remove(AppConstants.MDC_PARENT_CORRELATION_ID_KEY.getValue());
+		MDC.remove(AppConstants.MDC_CHILD_CORRELATION_ID_KEY.getValue());
 		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 	}
 

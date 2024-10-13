@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +29,8 @@ public class DbBaseModel {
 	protected LocalDateTime createdOn;
 	@Column(name = "processedon")
 	protected LocalDateTime processedOn;
+	@Transient
+	private String parentCorrelationId;
+	@Transient
+	private String childCorrelationId;
 }
