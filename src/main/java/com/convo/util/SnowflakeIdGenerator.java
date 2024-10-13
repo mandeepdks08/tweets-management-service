@@ -1,14 +1,17 @@
 package com.convo.util;
 
+import lombok.extern.slf4j.Slf4j;
+
 /*
  * Snowflake id pattern
  * Total bits = 64
  * <timestamp_bits><machineId_bits><sequence_bits>
  * With current config - 
- * sequence_bits = 10, i.e, max ids allowed per timestamp = 2^10 = 1024
- * machindeId_bits = 5, i.e, max id allowed = 2^5 = 32
+ * sequence_bits = 10, i.e, max ids allowed per timestamp = 2^10 = 1024 (0-1023)
+ * machindeId_bits = 5, i.e, max id allowed = 2^5 = 32 (0-31)
  * timetamp_bits = 64 - machineId_bits - sequence_bits = 49
  */
+@Slf4j
 public class SnowflakeIdGenerator {
 	private static long epoch = 1672531200000L;
 	private static long machineIdBits = 5L;
@@ -28,7 +31,7 @@ public class SnowflakeIdGenerator {
 
 	public SnowflakeIdGenerator(long machineId) {
 		long maxMachineId = 1 << machineIdBits;
-		if (machineId > maxMachineId) {
+		if (machineId >= maxMachineId) {
 			throw new RuntimeException("Machine id must be below max machine id limit " + maxMachineId);
 		}
 		this.machineId = machineId;
@@ -45,7 +48,9 @@ public class SnowflakeIdGenerator {
 			 */
 			long maxSequence = 1 << sequenceBits;
 			sequence++;
-			if (sequence > maxSequence) {
+			if (sequence >= maxSequence) {
+				log.warn("Sequence limit reached. Need to re-assess the limit. Current limit 0-{}, timestamp {}",
+						maxSequence - 1, timestamp);
 				sequence = 0L;
 				while (timestamp == lastTimestamp) {
 					timestamp = System.currentTimeMillis();
