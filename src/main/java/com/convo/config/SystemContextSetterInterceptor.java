@@ -9,7 +9,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.convo.communicator.UserServiceCommunicator;
 import com.convo.datamodel.User;
-import com.convo.util.SystemContextHolder;
+import com.convo.util.SystemContext;
 
 @Component
 public class SystemContextSetterInterceptor implements HandlerInterceptor {
@@ -22,8 +22,8 @@ public class SystemContextSetterInterceptor implements HandlerInterceptor {
 			throws Exception {
 		String token = request.getHeader("Authorization");
 		User user = userServiceCommunicator.authenticate(token);
-		SystemContextHolder.setLoggedInUser(user);
-		SystemContextHolder.setHttpRequest(request);
+		SystemContext.setLoggedInUser(user);
+		SystemContext.setHttpRequest(request);
 		return true;
 	}
 	
