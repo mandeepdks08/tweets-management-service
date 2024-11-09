@@ -18,9 +18,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.convo.datamodel.Tweet;
+import com.convo.datamodel.TweetLike;
 import com.convo.datamodel.User;
 import com.convo.kafka.TweetsProducer;
+import com.convo.repository.TweetLikeRepository;
 import com.convo.repository.TweetsRepository;
+import com.convo.restmodel.LikeTweetRequest;
 import com.convo.restmodel.ListTweetsRequest;
 import com.convo.restmodel.ListTweetsResponse;
 import com.convo.restmodel.TweetDeleteRequest;
@@ -41,6 +44,9 @@ public class TweetController {
 
 	@Autowired
 	private TweetsRepository tweetsRepo;
+
+	@Autowired
+	private TweetLikeRepository tweetLikeRepo;
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	protected void saveTweet(@RequestBody TweetSaveRequest tweetSaveRequest) {
@@ -94,6 +100,23 @@ public class TweetController {
 			return tweet;
 		} else {
 			throw new RuntimeException("Tweet not found");
+		}
+	}
+
+	@RequestMapping(value = "/like", method = RequestMethod.POST)
+	protected void likeTweet(@RequestBody LikeTweetRequest request) {
+		Long tweetId = request.getTweetId();
+		if (tweetId == null) {
+			throw new RuntimeException("Tweet id is required");
+		}
+		User loggedInUser = SystemContext.getLoggedInUser();
+		TweetLike tweetLike = tweetLikeRepo.findByTweetIdAndUserId(tweetId, loggedInUser.getUserId());
+		if (tweetLike == null) {
+			tweetLike = TweetLike.builder().tweetId(tweetId).userId(loggedInUser.getUserId())
+					.createdOn(LocalDateTime.now()).build();
+			tweetLikeRepo.save(tweetLike);
+		} else {
+			throw new RuntimeException("Tweet already liked");
 		}
 	}
 
