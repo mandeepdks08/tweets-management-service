@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +23,7 @@ import com.convo.kafka.TweetsProducer;
 import com.convo.repository.TweetsRepository;
 import com.convo.restmodel.ListTweetsRequest;
 import com.convo.restmodel.ListTweetsResponse;
+import com.convo.restmodel.TweetDeleteRequest;
 import com.convo.restmodel.TweetEditRequest;
 import com.convo.restmodel.TweetSaveRequest;
 import com.convo.util.GsonUtils;
@@ -71,5 +73,31 @@ public class TweetController {
 				HttpStatus.OK);
 	}
 
-	
+	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
+	protected void deleteTweet(@RequestBody TweetDeleteRequest tweetDeleteRequest) {
+		User loggedInUser = SystemContext.getLoggedInUser();
+		Long tweetId = tweetDeleteRequest.getTweetId();
+		Tweet tweet = tweetsRepo.findById(tweetId).orElse(null);
+		if (tweet != null && tweet.getUserId().equals(loggedInUser.getUserId())) {
+			tweet.setIsDeleted(true);
+			tweetsRepo.save(tweet);
+		} else {
+			throw new RuntimeException("Tweet not found");
+		}
+	}
+
+	@RequestMapping(value = "/show/{id}", method = RequestMethod.GET)
+	protected Tweet showTweet(@PathVariable Long id) {
+		if (id == null) {
+			throw new RuntimeException("Id to dede bhai");
+		}
+		User loggedInUser = SystemContext.getLoggedInUser();
+		Tweet tweet = tweetsRepo.findById(id).orElse(null);
+		if (tweet != null && tweet.getUserId().equals(loggedInUser.getUserId())) {
+			return tweet;
+		} else {
+			throw new RuntimeException("Tweet not found");
+		}
+	}
+
 }

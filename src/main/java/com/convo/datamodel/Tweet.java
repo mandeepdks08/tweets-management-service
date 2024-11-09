@@ -18,5 +18,7 @@ public class Tweet extends DbBaseModel {
 	private String userId;
 	@Column(name = "tweet")
 	private String tweet;
+	@Column(name = "isdeleted")
+	private Boolean isDeleted;
 	// In future we can add photos, videos, and audios as well
 }
