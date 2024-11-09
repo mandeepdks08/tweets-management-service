@@ -31,9 +31,7 @@ public class TweetController {
 		log.info("Tweet save request {}", GsonUtils.getGson().toJson(tweetSaveRequest));
 		User loggedInUser = SystemContext.getLoggedInUser();
 		Tweet tweet = Tweet.builder().userId(loggedInUser.getUserId()).tweet(tweetSaveRequest.getTweet())
-				.createdOn(LocalDateTime.now()).processedOn(LocalDateTime.now())
-				.parentCorrelationId(SystemContext.getParentCorrelationId())
-				.childCorrelationId(SystemContext.getChildCorrelationId()).build();
+				.createdOn(LocalDateTime.now()).processedOn(LocalDateTime.now()).build();
 		tweetsProducer.sendTweet(tweet);
 	}
 
@@ -42,8 +40,7 @@ public class TweetController {
 		log.info("Tweet edit request {}", GsonUtils.getGson().toJson(tweetEditRequest));
 		User loggedInUser = SystemContext.getLoggedInUser();
 		Tweet tweet = Tweet.builder().id(tweetEditRequest.getTweetId()).tweet(tweetEditRequest.getTweet())
-				.userId(loggedInUser.getUserId()).parentCorrelationId(SystemContext.getParentCorrelationId())
-				.childCorrelationId(SystemContext.getChildCorrelationId()).build();
+				.userId(loggedInUser.getUserId()).build();
 		tweetsProducer.sendTweet(tweet);
 	}
 
