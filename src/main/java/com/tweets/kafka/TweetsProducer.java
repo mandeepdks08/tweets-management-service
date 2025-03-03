@@ -13,7 +13,7 @@ import com.tweets.util.SystemContext;
 @Component
 public class TweetsProducer {
 
-	private static final String TWEETS_TOPIC = "tweets";
+	private static final String TWEETS_TOPIC = "tweets.to-persist";
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
