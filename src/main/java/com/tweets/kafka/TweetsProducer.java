@@ -20,10 +20,6 @@ public class TweetsProducer {
 
 	public void sendTweet(Tweet tweet) {
 		ProducerRecord<String, String> record = new ProducerRecord<>(TWEETS_TOPIC, GsonUtils.getGson().toJson(tweet));
-		record.headers().add(AppConstants.PARENT_CORRELATION_ID_HEADER.getValue(),
-				SystemContext.getParentCorrelationId().getBytes());
-		record.headers().add(AppConstants.CHILD_CORRELATION_ID_HEADER.getValue(),
-				SystemContext.getChildCorrelationId().getBytes());
 		kafkaTemplate.send(record);
 	}
 }
