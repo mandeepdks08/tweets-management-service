@@ -50,7 +50,6 @@ public class TweetController {
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	protected void saveTweet(@RequestBody TweetSaveRequest tweetSaveRequest) {
-		
 		log.info("Tweet save request {}", GsonUtils.getGson().toJson(tweetSaveRequest));
 		User loggedInUser = SystemContext.getLoggedInUser();
 		Tweet tweet = Tweet.builder().userId(loggedInUser.getUserId()).tweet(tweetSaveRequest.getTweet())
