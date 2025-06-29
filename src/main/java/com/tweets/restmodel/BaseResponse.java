@@ -11,5 +11,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class BaseResponse {
 	private String message;
+	private Boolean success;
 	private List<String> errors;
 }

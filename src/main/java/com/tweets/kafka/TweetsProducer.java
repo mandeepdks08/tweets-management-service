@@ -6,14 +6,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import com.tweets.datamodel.Tweet;
-import com.tweets.util.AppConstants;
+import com.tweets.exceptions.ServiceUnreachableException;
 import com.tweets.util.GsonUtils;
-import com.tweets.util.SystemContext;
 
 @Component
 public class TweetsProducer {
 
-	private static final String TWEETS_TOPIC = "tweets.to-persist";
+	private static final String TWEETS_TOPIC = "tweets.new";
 
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
@@ -21,5 +20,9 @@ public class TweetsProducer {
 	public void sendTweet(Tweet tweet) {
 		ProducerRecord<String, String> record = new ProducerRecord<>(TWEETS_TOPIC, GsonUtils.getGson().toJson(tweet));
 		kafkaTemplate.send(record);
+	}
+
+	public void fallback(Tweet tweet, Throwable t) {
+		throw new ServiceUnreachableException("Kafka is unreachable at the moment", t);
 	}
 }
